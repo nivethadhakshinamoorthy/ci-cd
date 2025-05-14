@@ -1,0 +1,44 @@
+name: Lint
+
+on:
+  push:
+    branches:
+      - main  # Trigger only on push to the main branch
+    paths:
+      - '**/*.js'  # Trigger only if JavaScript files are changed
+  pull_request:
+    branches:
+      - main  # Trigger on PR targeting the main branch
+    paths:
+      - '**/*.js'  # Trigger only if JavaScript files are changed
+
+permissions:
+  contents: read
+  packages: read
+  statuses: write  # To report GitHub Actions status checks
+
+jobs:
+  build:
+    name: Lint
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: read
+      statuses: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # super-linter needs the full git history
+
+      - name: Super-linter
+        uses: super-linter/super-linter@v7.4.0 # x-release-please-version
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          RUN_LOCAL: true  # Optional, set to true if running linter locally
+          LINTER_RULES_PATH: './path/to/custom/rules'  # Optional, specify custom linter rules
+          ENABLE_LINTING: 'true'  # Optional, enable or disable specific linters
+          FILTER_REGEX_EXCLUDE: ".*\.md|.*\.txt"  # Optional, exclude certain file types from linting (e.g., markdown or text files)
